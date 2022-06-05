@@ -1,0 +1,57 @@
+
+#### Question 1: Liste de tous les livres (’Book’)
+
+db.publis.find({"type" : "Book"});
+
+#### Question 2: Liste des publications depuis 2011 
+
+db.publis.find({year : {$gte : 2011}});
+
+#### Question 3: Liste des livres depuis 2014
+
+db.publis.find({"type" : "Book", year : {$gte : 2014}});
+
+#### Question 4: Liste des publications de “Toru Ishida” 
+
+db.publis.find({authors : "Toru Ishida"})
+
+#### Question 5: Liste de tous les publieur (“publisher”), distinctes
+
+db.publis.distinct("publisher");
+
+#### Question 6: Liste de tous les auteurs distincts
+
+db.publis.distinct("authors");
+
+#### Question 7: Trier les publications de “Toru Ishida” par titre de livre et par pages de début
+
+db.publis.aggregate([{$match:{authors : "Toru Ishida"}},
+{ $sort : { booktitle : 1, "pages.start" : 1 } }]);
+
+
+#### Question 8: Projeter le résultat sur le titre de la publication, et les pages
+
+db.publis.aggregate([{$match:{authors : "Toru Ishida"}},
+{$sort : { booktitle : 1, "pages.start" : 1 }},
+{$project : {title : 1, pages : 1}}])
+
+
+#### Question 9: Compter le nombre de ses publications
+
+db.publis.aggregate([{$match:{authors : "Toru Ishida"}},
+{$group:{_id:null, total : { $sum : 1}}}]);
+
+
+#### Question 10: Compter le nombre de publications depuis 2011 et par type 
+
+db.publis.aggregate([{$match:{year : {$gte : 2011}}},
+{$group:{_id:"$type", total : { $sum : 1}}}]);
+
+
+#### Question 11: Compter le nombre de publications par auteur. Trier le résultat par ordre croissant
+
+db.publis.aggregate([
+{ $unwind : "$authors" },
+{ $group : { _id : "$authors", number : { $sum : 1 } }},
+{$sort : {number : -1}}
+] );
